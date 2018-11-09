@@ -44,7 +44,7 @@ def loadcsv():
     path = './csvdata/' + request.args.get("path")
     kind = request.args.get("kind")
     executor.submit(loadfile, path, kind)
-    return "upload job started in the background"
+    return "New upload job started in the background"
 
 def loadfile(path, kind):
     with open(path) as f:
