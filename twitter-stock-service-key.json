@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "twitter-stock",
+  "private_key_id": "5037daaabbc607b5901307595c48df290a84dd39",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDSChy6rgZQaG/S\nUSZqvpk9uWP1LOHBAibOfQ5M+DLmt8pHeYIAzljZCTv1fXqYr67cQpfzAFQXdWxy\nFMXmgrE3uPGglqHbasLvXmOpz8960UqG54QoPgkuSdoFzMgGtOoo6pe5otM8VvwC\nuJ3pH3bp8d4unIDLqk529kwpJIo1r+GHud6CkA6X9uRbcyoDkMi63Z2O0uC9aEPu\n+pCm6uK5HRchYQKBv+jCFM75SWtYx/gfniC1luzKgVLFsL3GjbcDCD0TF7qce4Vs\ne6kWGeMgpLhR5N6oT2TXff+An+EbXg+gCIem+LA0pl/y3eEgICYFVMuOHmHULPuH\nuh3Og4+xAgMBAAECggEAZkEBCosFTOkDI2dZZhdDYE7ckHRYtY+YF+e+6g7dLQBl\n7FUFyuGqVIMP2yxK3oGNBfMvqWBMEB2c/Y8KZ3XR0/hoPc+HndwEaedQas/eSQMS\nHsogRz0oWA4hI7i12roB04id9ASGhPYt+x8o1WD5kdwr2BJeC4juaTDwFAmTdZ24\nR30I5QLfer6OLOd4LmmSZ0r2+tFz2xD33D1MlNGFXWg5+1Tyb6Y7dyQokcHxTjNo\n9Kb3De09obSbfXyF+DCyaKwvPvHel0fLHz6BdCHCJ+/3E1KUhM+wWLE879z/h67E\njSlpKiU8yXJl0g4INmFhvttN9Reo/IUyBNnjLpb5LwKBgQDrHotBtGMvxL8Xkl2s\nQCeHlsMRG8b+Jqg6FpILUcIlMKkFxF774/8d5kdIoTpA2BuFp+IAHf5JFoaz26gC\nbo+aDrS5H9H8GVdRmQecOM703Srg4f6fpJrBc7wY21Ik/5VVWPsqyhZebrJqjFZo\nJZJMf2OZ+32uGsvAK7Y5KMLHwwKBgQDksWBz4Epm1XLCOgQr4vAvt/o6HKr6QCbd\n4LpCeGLoG3mOkpYygETIAdeYyod5CZOBFRaTpx+tgy9a3EgI/L/19M6RRch+eE5s\nhWfjhW+AGs2IWGF1k5Oq6KlGc6tqkwWW6ebDG7r96Ho5lxsXIm1WMIBetPXPChOg\nWnKD/HfHewKBgFpkh81e+LMoxP7e+rx6fbgXMi+lqj+TxSFwA/3uFOIPbywUbyAQ\na8im+8jkk2zSqOIdxTmeTmDzFB6Z2GH296aW+Mwje6ucYoGwf8iD3q0tSori1+2w\nbv7o6+vyhgZLbLI/X3D3+NmdXWKxSZcIutJGN5i/o3YIP0VGiOw4y4nZAoGAQnxi\n6y1A1Can51mQjuW6KFVXVP+yoXB3HDhSTjLLpmkebNmm+uWZmYAXmt7+hazIClYE\nK0cCCaLC6Kpz8tDwSeQzDb746/Oz8Q7Txiyr3tVr/YCcTN9rpdtgIxBLvH8jt90m\nboCoW1rz9bw9bvteSBlvqJj5gYiPbiX9duu2MvMCgYAP2zVCxb3eXoTNNPR/kUum\n0uuDPCasGlsRb2JUKyM+wpXJiphS7v8dog+ort1UdPKNZAYyiLmcluDr3KOrBvFi\nx1TOfiCOyP0KZ/yjzwZYRQuP8AzEaIlsLBsCd4vQcTCGCLYkwWAY9jVAG5eWhqlg\nkeZd0N1lvk0dWHajE9k8Dg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "yczhao95@twitter-stock.iam.gserviceaccount.com",
+  "client_id": "115615749114961994962",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/yczhao95%40twitter-stock.iam.gserviceaccount.com"
+}
