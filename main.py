@@ -38,6 +38,7 @@ def hello():
     datastore_client.put(stock)
     return ('saved{}:{}'.format(stock.key.name, stock['date']))
 
+#upload new csv to nosql datastore
 @app.route('/loadcsv', methods=['GET'])
 def loadcsv():
     path = './csvdata/' + request.args.get("path")
