@@ -28,6 +28,22 @@ def shift_day(date, shift_d):
     res += str(d)
     return res
 
+def scale_down(result, scale):
+    volume = 0.
+    cnt = 0
+    data = []
+    for res in result:
+        volume += float(res['volume'])
+        cnt += 1
+        if cnt % scale == 0 : 
+            tmp_entry = {};
+            tmp_entry['date'] = res['day']
+            tmp_entry['minute'] = res['minute']
+            tmp_entry['close'] = res['close']
+            tmp_entry['volume'] = volume
+            volume= 0
+            data.append(tmp_entry)
+    return data
 
 
 if __name__ == '__main__':

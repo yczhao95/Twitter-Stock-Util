@@ -18,7 +18,7 @@ from google.cloud import datastore
 import concurrent.futures as cf
 import csv
 
-import query_util.py
+import query_util as qu
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 executor = cf.ThreadPoolExecutor(2)
@@ -72,39 +72,26 @@ def loadfile(path, kind):
 day_range_set = {'1', '5', '30', '360'}
 CHART_DENSITY = 100
 
-m = [30, 31, 
-def shift_day(y, m, d):
     
 @app.route('/queryrange', methods=['GET'])
 def query():
-    stock = request.args.get('stock')
-    query = datastore_client.query(kind = stock)
+    kind = './csvdata/2015.csv'
+    query = datastore_client.query(kind = kind)
     end_time =  request.args.get('end')
-    day_range = request.args.get('range')
-    if day_range not in day_range_set: 
-        return "illegal range"
+    day_range = (int)(request.args.get('range'))
+    scale = (int)(request.args.get('scale'))
     
-
-    if day_range == '1':
-        start_time = end_time + "-000"
-        end_time = end_time + "-960"
-        start_key = datastore_client.key(kind, start_time)
-         end_key = datastore_client.key(kind, end_time)
-        query.key_filter(start_key,'>')
-        query.key_filter(end_key,'<')
-        result = list(query.fetch())
-    else if day_range == '5':
-        y = end_time[0:3]
-        m = end_time[5:6]
-        d = end_time[8:9]
-
-    start_key = datastore_client.key(kind, start_time);
-    end_key = datastore_client.key(kind, end_time);
+    start_time = qu.shift_day(end_time, day_range - 1) + '-000'
+    end_time = end_time + '-960'
+    start_key = datastore_client.key(kind, start_time)
+    end_key = datastore_client.key(kind, end_time)
     query.key_filter(start_key,'>')
     query.key_filter(end_key,'<')
     result = list(query.fetch())
+
+    scaled_result = qu.scale_down(result, scale)   
     #myarray = np.asarray(result)
-    js = json.dumps(result)
+    js = json.dumps(scaled_result)
     resp = Response(js, status=200, mimetype='application/json')
     resp.headers['Link'] = "http://twitter-stock.com"
     resp.headers['Access-Control-Allow-Origin'] = '*'
