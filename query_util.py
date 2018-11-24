@@ -35,16 +35,32 @@ def scale_down(result, scale):
     for res in result:
         volume += float(res['volume'])
         cnt += 1
-        if cnt % scale == 0 : 
-            tmp_entry = {};
+        if cnt == scale :
+            cnt = 0
+            tmp_entry = {}
             tmp_entry['date'] = res['day']
-            tmp_entry['minute'] = res['minute']
+            tmp_entry['time'] = get_min(int(res['minute']), 4)
             tmp_entry['close'] = res['close']
             tmp_entry['volume'] = volume
             volume= 0
             data.append(tmp_entry)
     return data
 
+def get_min(minute, start):
+    h = start
+    m = minute
+    while m >= 60 :
+        m -= 60
+        h += 1
+    res = ""
+    if h < 10:
+        res += "0"
+    res += str(h)
+    res += ":"
+    if m < 10:
+        res += "0"
+    res += str(m)
+    return res
 
 if __name__ == '__main__':
     print(shift_day('2018-11-08', 8))
