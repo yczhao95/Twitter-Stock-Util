@@ -17,6 +17,8 @@ from flask import Flask,json,request,Response
 from google.cloud import datastore
 import concurrent.futures as cf
 import csv
+
+import query_util.py
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 executor = cf.ThreadPoolExecutor(2)
@@ -66,13 +68,36 @@ def loadfile(path, kind):
                 print (i)
     return "data successfully loaded to noSQL datastore"
 
+
+day_range_set = {'1', '5', '30', '360'}
+CHART_DENSITY = 100
+
+m = [30, 31, 
+def shift_day(y, m, d):
+    
 @app.route('/queryrange', methods=['GET'])
 def query():
-    kind = request.args.get('kind')
-    query = datastore_client.query(kind = kind)
-    start_time =  request.args.get('start')
+    stock = request.args.get('stock')
+    query = datastore_client.query(kind = stock)
     end_time =  request.args.get('end')
-    scale = request.args.get('scale')# in terms of minute
+    day_range = request.args.get('range')
+    if day_range not in day_range_set: 
+        return "illegal range"
+    
+
+    if day_range == '1':
+        start_time = end_time + "-000"
+        end_time = end_time + "-960"
+        start_key = datastore_client.key(kind, start_time)
+         end_key = datastore_client.key(kind, end_time)
+        query.key_filter(start_key,'>')
+        query.key_filter(end_key,'<')
+        result = list(query.fetch())
+    else if day_range == '5':
+        y = end_time[0:3]
+        m = end_time[5:6]
+        d = end_time[8:9]
+
     start_key = datastore_client.key(kind, start_time);
     end_key = datastore_client.key(kind, end_time);
     query.key_filter(start_key,'>')
