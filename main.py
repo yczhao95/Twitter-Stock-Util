@@ -40,7 +40,7 @@ def hello():
     datastore_client.put(stock)
     return ('saved{}:{}'.format(stock.key.name, stock['date']))
 
-"""deprecated
+
 @app.route('/loadcsv', methods=['GET'])
 def loadcsv():
     path = './csvdata/' + request.args.get("path")
@@ -51,7 +51,6 @@ def loadcsv():
 def loadfile(path, kind):
     with open(path) as f:
         reader = csv.reader(f)
-        i = 0
         for row in reader:
             name = row[0]
             stock_key = datastore_client.key(kind, name)
@@ -64,15 +63,12 @@ def loadfile(path, kind):
             stock['high'] = row[4]
             stock['volume'] = row[5]
             datastore_client.put(stock)
-            i = i + 1
-            if i%100 == 0:
-                print (i)
     return "data successfully loaded to noSQL datastore"
-"""
+
     
 @app.route('/queryrange', methods=['GET'])
 def query():
-    kind = './csvdata/2015.csv'
+    kind = 'spy'
     query = datastore_client.query(kind = kind)
     end_time =  request.args.get('end')
     day_range = (int)(request.args.get('range'))
