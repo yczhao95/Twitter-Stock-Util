@@ -40,6 +40,7 @@ def hello():
     datastore_client.put(stock)
     return ('saved{}:{}'.format(stock.key.name, stock['date']))
 
+"""deprecated
 @app.route('/loadcsv', methods=['GET'])
 def loadcsv():
     path = './csvdata/' + request.args.get("path")
@@ -67,11 +68,7 @@ def loadfile(path, kind):
             if i%100 == 0:
                 print (i)
     return "data successfully loaded to noSQL datastore"
-
-
-day_range_set = {'1', '5', '30', '360'}
-CHART_DENSITY = 100
-
+"""
     
 @app.route('/queryrange', methods=['GET'])
 def query():
