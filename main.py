@@ -155,6 +155,73 @@ def query_tweets():
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
+@app.route('/loadPredict', methods = ['GET'])
+def loadcsv_predict():
+    path = './csvdata/' + request.args.get("path")
+    # Trump tweets
+    kind = 'prediction'
+    executor.submit(loadfile_tweets, path, kind)
+    return "New upload job started in the background"
+
+def loadfile_predict(path, kind):
+    with open(path) as f:
+        reader = csv.reader(f)
+        for row in reader:
+                year = row[0]
+                month = row[1]
+                day = row[2]
+                minute = row[3]
+                timestamp = str(year) + '-' + str(month).zfill(2) + '-' + str(day).zfill(2) + '-' + str(minute).zfill(4)
+                predict_key = datastore_client.key(kind, timestamp)
+                predict = datastore.Entity(key=predict_key)
+                predict['time'] = timestamp
+                predict['twt_id'] = row[4]
+                for i in range(6,36):
+                    attribute = "delta" + str(i - 6)
+                    predict[attribute] = row[i]
+                datastore_client.put(predict)
+    print "finished reading"
+    return "data successfully loaded to noSQL datastore"
+
+@app.route('/queryPredict', methods = ['GET'])
+def query_predict():
+    # get all Trump tweets entities
+    kind = 'prediction'
+    query = datastore_client.query(kind = kind)
+    time = request.args.get('time')
+    time_key = datastore_client.key(kind, time)
+    query.key_filter(time_key, '=')
+    result = list(query.fetch())
+    
+
+    stock_kind = 'spy'
+    stock_query = datastore_client.query(kind = stock_kind)
+    stock_time_key = datastore_client.key(stock_kind, time)
+    stock_query.key_filter(stock_time_key, '=')
+    stock_data = list(stock_query.fetch())[0]
+
+    filtered_result = []
+
+    for record in result:
+        tmp_entry = {}
+        time = record['time']
+        minute = int(time[11:15])
+        hour = int(minute / 60)
+        minute = minute % 60
+        price = float(stock_data['close'])
+        tmp_entry['date'] = time[:10]
+        tmp_entry['time'] = str(hour).zfill(2) + ':' + str(minute).zfill(2)
+        for i in range(30):
+            attribute = "price_" + str(i)
+            pred_attr = "delta" + str(i)
+            price = price + float(record[pred_attr])
+            tmp_entry[attribute] = price 
+        filtered_result.append(tmp_entry)
+    js = json.dumps(filtered_result)
+    resp = Response(js, status = 200, mimetype='application/json')
+    resp.headers['link'] = "http://twitter-stock.com"
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 
 if __name__ == '__main__':
