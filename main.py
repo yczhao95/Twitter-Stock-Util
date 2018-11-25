@@ -68,7 +68,7 @@ def loadfile(path, kind):
 
 @app.route('/queryrange', methods=['GET'])
 def query():
-    kind = 'spy'
+    kind = 'stockSPY'
     query = datastore_client.query(kind = kind)
     end_time =  request.args.get('end')
     day_range = (int)(request.args.get('range'))
@@ -96,7 +96,7 @@ def query():
 def loadcsv_tweets():
     path = './csvdata/' + request.args.get("path")
     # Trump tweets
-    kind = 'Trump'
+    kind = 'tweetTrump'
     executor.submit(loadfile_tweets, path, kind)
     return "New upload job started in the background"
 
@@ -126,7 +126,7 @@ def loadfile_tweets(path, kind):
 @app.route('/queryTweets', methods = ['GET'])
 def query_tweets():
     # get all Trump tweets entities
-    kind = 'Trump'
+    kind = 'tweetTrump'
     query = datastore_client.query(kind = kind)
     end_time = request.args.get('end')
     day_range = (int)(request.args.get('range'))
@@ -150,6 +150,81 @@ def query_tweets():
         tmp_entry['id'] = record['id']
         tmp_entry['retweet'] = record['retweet_count']
         tmp_entry['favorate'] = record['favorate_count']
+        filtered_result.append(tmp_entry)
+    js = json.dumps(filtered_result)
+    resp = Response(js, status = 200, mimetype='application/json')
+    resp.headers['link'] = "http://twitter-stock.com"
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+
+@app.route('/loadPredict', methods = ['GET'])
+def loadcsv_predict():
+    path = './csvdata/' + request.args.get("path")
+    # Trump tweets
+    kind = 'predictionSPY2'
+    executor.submit(loadfile_predict, path, kind)
+    return "New upload job started in the background"
+
+def loadfile_predict(path, kind):
+    with open(path) as f:
+        reader = csv.reader(f)
+        for row in reader:
+                year = row[0]
+                month = row[1]
+                day = row[2]
+                minute = row[3]
+                timestamp = str(year) + '-' + str(month).zfill(2) + '-' + str(day).zfill(2) + '-' + str(minute).zfill(3)
+                predict_key = datastore_client.key(kind, timestamp)
+                predict = datastore.Entity(key=predict_key)
+                predict['time'] = timestamp
+                predict['twt_id'] = row[4]
+                for i in range(6,36):
+                    attribute = "delta" + str(i - 6)
+                    predict[attribute] = row[i]
+                datastore_client.put(predict)
+    return "data successfully loaded to noSQL datastore"
+
+@app.route('/queryPredict', methods = ['GET'])
+def query_predict():
+    # get all Trump tweets entities
+    kind = 'predictionSPY2'
+    query = datastore_client.query(kind = kind)
+    date = request.args.get('date')
+    time0 = request.args.get('time')
+    hour = int(time0[:2]) - 4
+    minute = int(time0[3:5])
+    m = hour * 60 + minute
+    time1 = date + '-' + str(m).zfill(3)
+
+    time_key = datastore_client.key(kind, time1)
+    query.key_filter(time_key, '=')
+    result = list(query.fetch())
+
+
+    stock_kind = 'stockSPY'
+    stock_query = datastore_client.query(kind = stock_kind)
+    stock_time_key = datastore_client.key(stock_kind, time1)
+    stock_query.key_filter(stock_time_key, '=')
+    stock_data = list(stock_query.fetch())[0]
+    print(time_key)
+    print(stock_time_key)
+    filtered_result = []
+
+    for record in result:
+        tmp_entry = {}
+        time = record['time']
+        minute = int(time[11:15])
+        hour = int(minute / 60) + 4
+        minute = minute % 60
+        price = float(stock_data['close'])
+        tmp_entry['date'] = time[:10]
+        tmp_entry['time'] = str(hour).zfill(2) + ':' + str(minute).zfill(2)
+        for i in range(30):
+            attribute = "price_" + str(i)
+            pred_attr = "delta" + str(i)
+            price = price + float(record[pred_attr])
+            tmp_entry[attribute] = price
         filtered_result.append(tmp_entry)
     js = json.dumps(filtered_result)
     resp = Response(js, status = 200, mimetype='application/json')
