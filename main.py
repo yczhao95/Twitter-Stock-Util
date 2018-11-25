@@ -92,7 +92,7 @@ def query():
 def loadcsv_tweets():
     path = './csvdata/' + request.args.get("path")
     # Trump tweets
-    kind = request.args.get('kind')
+    kind = 'Trump'
     executor.submit(loadfile_tweets, path, kind)
     return "New upload job started in the background"
 
@@ -102,18 +102,20 @@ def loadfile_tweets(path, kind):
         i = 0
         for row in reader:
             if i > 0:
-                id_str = row[4]
-                tweet_key = datastore_client.key(kind, id_str)
+                year = row[0]
+                month = row[1]
+                day = row[2]
+                minute = row[3]
+                timestamp = str(year) + '-' + str(month).zfill(2) + '-' + str(day).zfill(2) + '-' + str(minute).zfill(4)
+                tweet_key = datastore_client.key(kind, timestamp)
                 tweet = datastore.Entity(key=tweet_key)
-                tweet['year'] = row[0]
-                tweet['month'] = row[1]
-                tweet['day'] = row[2]
-                tweet['minute'] = row[3]
+                tweet['time'] = timestamp
                 tweet['EST'] = row[5]
                 tweet['text'] = row[7]
                 tweet['retweet_count'] = row[8]
                 tweet['favorate_count'] = row[9]
-                tweet['link'] = "https://twitter.com/realDonaldTrump/status/" + id_str
+                tweet['id'] = row[4]
+                print(tweet['time'])
                 datastore_client.put(tweet)
             i = i + 1
     print "finished reading"
@@ -122,24 +124,35 @@ def loadfile_tweets(path, kind):
 @app.route('/queryTweets', methods = ['GET'])
 def query_tweets():
     # get all Trump tweets entities
-    kind = request.args.get('kind')
+    kind = 'Trump'
     query = datastore_client.query(kind = kind)
-    year = request.args.get('year')
-    month = request.args.get('month')
-    day = request.args.get('day')
-    minute = request.args.get('minute')
-    year_key = datastore_client.key(kind, year)
-    month_key = datastore_client.key(kind, month)
-    day_key = datastore_client.key(kind, day)
-    minute_key = datastore_client.key(kind, minute)
-    query.key_filter(year_key,'=')
-    query.key_filter(month_key,'=')
-    query.key_filter(day_key,'=')
-    query.key_filter(minute_key,'=')
+    end_time = request.args.get('end')
+    day_range = (int)(request.args.get('range'))
+    start_time = qu.shift_day(end_time, day_range - 1) + '-0000'
+    end_time = end_time + '-' + str(24 * 60)
+    start_key = datastore_client.key(kind, start_time)
+    end_key = datastore_client.key(kind, end_time)
+    query.key_filter(start_key, '>')
+    query.key_filter(end_key, '<')
     result = list(query.fetch())
-    js = json.dumps(result)
+    filtered_result = []
+    for record in result:
+        tmp_entry = {}
+        time = record['time']
+        minute = int(time[11:15])
+        hour = int(minute / 60)
+        minute = minute % 60
+        tmp_entry['date'] = time[:10]
+        tmp_entry['time'] = str(hour).zfill(2) + ':' + str(minute).zfill(2)
+        tmp_entry['text'] = record['text']
+        tmp_entry['id'] = record['id']
+        tmp_entry['retweet'] = record['retweet_count']
+        tmp_entry['favorate'] = record['favorate_count']
+        filtered_result.append(tmp_entry)
+    js = json.dumps(filtered_result)
     resp = Response(js, status = 200, mimetype='application/json')
     resp.headers['link'] = "http://twitter-stock.com"
+    resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
 
